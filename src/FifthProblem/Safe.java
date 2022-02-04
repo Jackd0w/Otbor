@@ -2,13 +2,11 @@ package FifthProblem;
 
 class Safe {
 
-    // A utility function that returns maximum of two integers
     static int max(int a, int b)
     { return (a > b) ? a : b; }
 
-    // Returns the maximum value that can be put in a knapsack
-    // of capacity W
-    static int knapSack(int W, int wt[], int val[], int n)
+
+    static int safe(int W, int wt[], int val[], int n)
     {
         int i, w;
         int K[][] = new int[n + 1][W + 1];
@@ -28,13 +26,12 @@ class Safe {
         return K[n][W];
     }
 
-    // Driver program to test above function
     public static void main(String args[])
     {
         int val[] = new int[] { 60, 100, 120 };
         int wt[] = new int[] { 10, 20, 30 };
         int W = 50;
         int n = val.length;
-        System.out.println(knapSack(W, wt, val, n));
+        System.out.println(safe(W, wt, val, n));
     }
 }
