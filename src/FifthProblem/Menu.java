@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static FifthProblem.ItemList.createItemDatabase;
 
-public class ItemService {
+
+
+class ItemInfo {
 
     private final Safe safe;
     private final List<Item> items;
@@ -42,18 +45,18 @@ public class ItemService {
                 .collect(Collectors.toList()).get(0).getSize();
     }
 
-    public List<Item> putItemInTheSafeWithMaxPrice(List<Item> sortedList, int volume) {
+    public List<Item> putItemInTheSafeWithMaxPrice(List<Item> sortedList, int size) {
         List<Item> resultList = new ArrayList<>();
-        safe.setVolume(volume);
+        safe.setSize(size);
 
         for (int i = 0; i < sortedList.size(); i++) {
-            int sumVolume = sortedList.get(i).getSize() * sortedList.get(i).getNumber();
-            if (safe.getVolume() >= sumVolume) {
+            int sumSize = sortedList.get(i).getSize() * sortedList.get(i).getNumber();
+            if (safe.getSize() >= sumSize) {
                 resultList.add(new Item(sortedList.get(i).getName(), sortedList.get(i).getNumber(),
                         sortedList.get(i).getSize(), sortedList.get(i).getPrice()));
-                safe.setVolume(safe.getVolume() - sumVolume);
+                safe.setSize(safe.getSize() - sumSize);
             } else {
-                int newNumber = safe.getVolume() / sortedList.get(i).getSize();
+                int newNumber = safe.getSize() / sortedList.get(i).getSize();
                 if (newNumber > 0) {
                     resultList.add(new Item(sortedList.get(i).getName(), newNumber,
                             sortedList.get(i).getSize(), sortedList.get(i).getPrice()));
@@ -77,11 +80,85 @@ public class Menu {
                     "4. Exit\n";
 
     private final Scanner scanner;
-    private final ItemService service;
+    private final ItemInfo info;
 
     public Menu() {
         this.scanner = new Scanner(System.in);
-        this.service = new ItemService();
+        this.info = new ItemInfo();
+    }
+
+    private void errorMenu(String errorMessage) {
+        System.out.println(errorMessage);
+        scanner.nextLine();
+    }
+
+    private void setAModelOfTheSafe() {
+        System.out.println("Input the Safe Model: ");
+        String model = scanner.nextLine();
+    }
+
+    private void setStateOfSafe() {
+        System.out.println("Input the Safe Model: ");
+        String model = scanner.nextLine();
+    }
+
+    private boolean isNumber1(String str) {
+        if (str.isBlank()) {//  if (str == null || str.isEmpty())
+            return false;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int getSizeFromUser() {
+        int volumeInt;
+        String volumeStr;
+        while (true) {
+            System.out.println("Input a volume of the safe :");
+            volumeStr = scanner.nextLine();
+            if (isNumber1(volumeStr)) {
+                volumeInt = Integer.parseInt(volumeStr);
+
+                if (volumeInt >= info.findMinVolumeFromItemList() && volumeInt > 0) {
+                    return volumeInt;
+                } else {
+                    errorMenu("Input a volume of the safe more than " +
+                            +info.findMinVolumeFromItemList()
+                            + "\n press any key to continue");
+                }
+            } else {
+                errorMenu("Please input only digits .\n Input a volume of the safe more than " +
+                        +info.findMinVolumeFromItemList()
+                        + "\n press any key to continue");
+            }
+        }
+    }
+
+    public int getAnswerFromMenu(String message, int input_size) {
+        String answer;
+        int result;
+        while (true) {
+            System.out.println(message);
+            if (scanner.hasNextLine()) {
+                answer = scanner.nextLine();
+                if (isNumber1(answer)) {
+                    result = Integer.parseInt(answer);
+                    if (result <= input_size && result > 0) {
+                        return result;
+                    } else {
+                        errorMenu("Please input digits from 1 to "
+                                + input_size + "\npress any key to continue");
+                    }
+                } else {
+                    errorMenu("Please input only digits "
+                            + "\npress any key to continue");
+                }
+            }
+        }
     }
 
     public void mainMenu() {
@@ -91,15 +168,15 @@ public class Menu {
             choice = getAnswerFromMenu(startMessage, 4);
             switch (choice) {
                 case 1:
-                    service.printItemList();
+                    info.printItemList();
                     break;
                 case 2:
-                    service.printSortedListByPrice(service.sortByPrice());
+                    info.printSortedListByPrice(info.sortByPrice());
                     break;
                 case 3:
-                    setAModelOfTheSafe();
-                    service.printItemInTheSafeWithMaxPrice(service.putItemInTheSafeWithMaxPrice
-                            (service.sortByPrice(), getVolumeFromConsole()));
+                    setStateOfSafe();
+                    info.printItemInTheSafeWithMaxPrice(info.putItemInTheSafeWithMaxPrice
+                            (info.sortByPrice(), getSizeFromUser()));
                     break;
                 case 4:
                     return;

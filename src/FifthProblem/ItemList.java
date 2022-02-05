@@ -54,7 +54,7 @@ class Item {
         return "Item{" +
                 "name='" + name + '\'' +
                 ", number=" + number +
-                ", volume=" + size +
+                ", size=" + size +
                 ", price=" + price +
                 '}';
     }
@@ -72,4 +72,6 @@ public class ItemList {
         items.add(new Item("Money", 1, 20,150));
         return items;
     }
+
+
 }
